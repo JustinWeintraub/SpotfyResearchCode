@@ -1,0 +1,33 @@
+[
+  {
+    "endTime": "2022-05-23 12:33",
+    "artistName": "Selphius",
+    "trackName": "Silent Solitude",
+    "msPlayed": 19799,
+    "minutePlayed": 33,
+    "hourPlayed": 12,
+    "dayPlayed": 23,
+    "monthPlayed": 5,
+    "yearPlayed": 2022,
+    "seasonPlayed": "spring",
+    "freqPlayed": 1.0,
+    "danceability": 0.512,
+    "energy": 0.939,
+    "key": 3,
+    "loudness": -3.322,
+    "mode": 0,
+    "speechiness": 0.0747,
+    "acousticness": 0.0516,
+    "instrumentalness": 0,
+    "liveness": 0.0832,
+    "valence": 0.347,
+    "tempo": 111.988,
+    "type": "audio_features",
+    "id": "27OZX3T053Z6soUHhXPoCq",
+    "uri": "spotify:track:27OZX3T053Z6soUHhXPoCq",
+    "track_href": "https://api.spotify.com/v1/tracks/27OZX3T053Z6soUHhXPoCq",
+    "analysis_url": "https://api.spotify.com/v1/audio-analysis/27OZX3T053Z6soUHhXPoCq",
+    "duration_ms": 214771,
+    "time_signature": 4
+  }
+]

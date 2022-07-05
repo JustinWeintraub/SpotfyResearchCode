@@ -12,6 +12,13 @@ parser.add_argument(
     # "A json file to be used as input"
 )
 parser.add_argument(
+    '--seen-songs',
+    dest='seen_songs',
+    type=str,
+    required=True,
+    # "A json file to be used as input"
+)
+parser.add_argument(
     '--output',
     dest='output',
     type=str,
@@ -36,6 +43,7 @@ input = args.input
 output = args.output
 min_secs = args.min_secs
 access_token = args.access_token
+seen_songs = args.seen_songs
 
 
 def get_season(now):
@@ -101,14 +109,18 @@ def request_audio_features(items):
     title_data = {}
     res_data = {}
     ids = []
+    songs_file = open(seen_songs, "r")
+    songs_data = json.load(songs_file)
     for i, item in enumerate(items):
-        print("Getting data for track " + str(i) +
-              " out of " + str(len(items)-1))
+        print("Getting data for track " + str(i + 1) +
+              " out of " + str(len(items)))
         errs = 0
         while True:
             try:
-                 # getting the track id
-                if item['trackName'] not in title_data:
+                # getting the track id
+                if  item['trackName'] not in title_data and item['trackName'] in songs_data:
+                    items[i].update(songs_data[item['trackName']])
+                elif item['trackName'] not in title_data and item['trackName'] not in songs_data:
                     feature_req = requests.get(
                         BASE_URL + 'search/?q=' + item['trackName'] + "&type=track&locale=en-US%2Cen%3Bq%3D0.9&offset=0&limit=1", headers=head).json()
                     title_data[item['trackName']
@@ -119,9 +131,9 @@ def request_audio_features(items):
                 break
             except:
                 if errs == 0:
-                    print("An error has occurred. Retrying in 5 seconds...")
+                    print("An error has occurred. Retrying in 3 seconds...")
                     errs += 1
-                    time.sleep(5)
+                    time.sleep(3)
                 else:
                     print("Cannot extract track data.")
                     break
@@ -132,16 +144,20 @@ def request_audio_features(items):
             id_data = {}
             for k, v in title_data.items():
                 id_data[v] = title_data.get(v, []) + [k]
-            for i, feature in enumerate(feature_req["audio_features"]):
-                for title in id_data[ids[i]]:
-                    res_data[title] = feature
+            if "audio_features" in feature_req:
+                for i, feature in enumerate(feature_req["audio_features"]):
+                    for title in id_data[ids[i]]:
+                        res_data[title] = feature
+                        songs_data[title] = feature
             ids = []
     for i, item in reversed(list(enumerate(items))):
         # if track doesn't have data remove it from consideration
-        if item['trackName'] not in res_data or res_data[item['trackName']] is None:
+        if item['trackName'] not in songs_data or songs_data[item['trackName']] is None:
             items.pop(i)
         else:
-            items[i].update(res_data[item['trackName']])
+            items[i].update(songs_data[item['trackName']])
+    output_file = open(seen_songs, "w")
+    json.dump(songs_data, output_file)
     return items
 
 
@@ -172,5 +188,6 @@ def get_output(items):
 
 input_file = open(input, "r")
 input_data = json.load(input_file)
+print(input_data)
 output_file = open(output, "w")
 json.dump(get_output(input_data), output_file)
